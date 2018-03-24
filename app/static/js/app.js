@@ -20,8 +20,8 @@ Vue.component('app-header', {
               </div>
             </nav>
         </header>    
-    `,
-    data: function() {}
+    `//,
+    //data: function() {}
 });
 
 Vue.component('app-footer', {
@@ -39,6 +39,69 @@ Vue.component('app-footer', {
     }
 })
 
+Vue.component('news-list',{
+    template: ` 
+    <div class="news container-fluid align-center">
+        <h2>News</h2>
+        <br>
+        <div class="row">
+            <div v-for="article in articles" class="col mt-5">
+                <div class="card h-100" style="width: 18rem;">
+                    <img class="card-img-top" :src=article.urlToImage alt="Card image cap">
+                    <div class="card-body">
+                         <h5 class="card-title">{{article.title}}</h5>
+                         <p class="card-text">{{article.description}}</p>
+                         <a :href="article.url" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        <div class="col"></div>
+    </div>
+    <br>
+    <div class="form-inline d-flex justify-content-center">
+        <div class="form-group mx-sm-3 mb-2">
+            <label class="sr-only" for="search">Search</label>
+            <input type="search" name="search" v-model="searchTerm"
+            id="search" class="form-control mb-2 mr-sm-2" placeholder="Enter search term here" />
+            <button class="btn btn-primary mb-2"
+            @click="searchNews">Search</button>
+        </div>
+    </div>
+</div>
+    `,
+    created: function(){
+        let self = this;
+        fetch('https://newsapi.org/v2/top-headlines?country=us&apiKey=b8f0408734ef4c5f9b9e7ba7ba27a787')
+        .then(function(response){
+            return response.json();
+        })
+            .then(function(data){
+                console.log(data);
+                self.articles = data.articles;
+            }); 
+    },
+    data: function() {
+        return {
+            articles: [],
+            searchTerm: ''
+        }
+    },
+    methods:{
+    searchNews: function() {
+        let self = this;
+        fetch('https://newsapi.org/v2/everything?q='+
+        self.searchTerm + '&language=en&apiKey=b8f0408734ef4c5f9b9e7ba7ba27a787')
+        .then(function(response) {
+        return response.json();
+        })
+        .then(function(data) {
+        console.log(data);
+        self.articles = data.articles;
+        });
+    }
+ }
+});
+
 
 let app = new Vue({
     el: '#app',
@@ -46,4 +109,5 @@ let app = new Vue({
         welcome: 'Hello World! Welcome to VueJS'
     }
 });
+
 
